@@ -1,8 +1,16 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import EventForm from "./RecurringForm.js";
 import AuthService from "../services/auth.service";
 
 const Profile = () => {
   const currentUser = AuthService.getCurrentUser();
+  const [addRecurring, setAddRecurring] = useState(false);
+  const [start, setStart] = useState("");
+  const [end, setEnd] = useState("");
+  const [game, setGame] = useState("");
+  const [desc, setDesc] = useState("");
+  const [events, setEvents] = useState("");
+  const [eventId, setEventId] = useState("");
 
   return (
     <div className="container">
@@ -11,21 +19,6 @@ const Profile = () => {
           <strong>{currentUser.username}</strong> Profile
         </h3>
       </header>
-      <p>
-        <strong>Token:</strong> {currentUser.accessToken.substring(0, 20)} ...{" "}
-        {currentUser.accessToken.substr(currentUser.accessToken.length - 20)}
-      </p>
-      <p>
-        <strong>Id:</strong> {currentUser.id}
-      </p>
-      <p>
-        <strong>Email:</strong> {currentUser.email}
-      </p>
-      <strong>Authorities:</strong>
-      <ul>
-        {currentUser.roles &&
-          currentUser.roles.map((role, index) => <li key={index}>{role}</li>)}
-      </ul>
     </div>
   );
 };

@@ -1,11 +1,13 @@
 import axios from "axios";
 import authHeader from "./auth-header";
 
-const API_URL = "http://localhost:8080/api/test/";
+const API_URL = "http://localhost:8080/api/";
 
-const addevent = (game, description, date, start, end, userId) => {
+// const API_URL = "https://planner.millbeelp.com/api/";
+
+const addEvent = (game, description, date, start, end, userId) => {
   return axios
-    .post(API_URL + "event", {
+    .post(API_URL + "event/add", {
       game,
       description,
       date,
@@ -18,20 +20,42 @@ const addevent = (game, description, date, start, end, userId) => {
     });
 };
 
-const getUserEvents = (userId, date) => {
-  // console.log(date);
+const updateEvent = (game, description, date, start, end, id) => {
   return axios
-    .get(API_URL + "event" + "?userId=" + userId + "&date=" + date, {
-      headers: authHeader(),
+    .post(API_URL + "event/update?id=" + id, {
+      game,
+      description,
+      date,
+      start,
+      end,
     })
-    .then((res) => {
-      // console.log("fewa");
-      // console.log(res.data);
-      return res.data;
+    .then((response) => {
+      return response.data;
     });
 };
 
+const getUserEvents = (userId) => {
+  return axios.get(API_URL + "event?userId=" + userId).then((res) => {
+    return res.data;
+  });
+};
+
+const deleteEvent = (userId) => {
+  return axios.post(API_URL + "event/delete?id=" + userId).then((response) => {
+    return response.data;
+  });
+};
+
+const addRecurringEvent = (array) => {
+  return axios.post(API_URL + "event/addrecurring", array).then((response) => {
+    return response.data;
+  });
+};
+
 export default {
-  addevent,
+  addEvent,
   getUserEvents,
+  updateEvent,
+  deleteEvent,
+  addRecurringEvent,
 };
