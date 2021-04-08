@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import EventForm from "./PlannerForm.js";
 import StreamDisplay from "./PlannerEvents.js";
+import { useDeepCompareEffect } from "react-use";
 
 import {
   format,
@@ -16,7 +17,7 @@ import {
 import AuthService from "../services/auth.service";
 import EventService from "../services/event.service";
 
-const isoYearFormat = "yyyy-MM-d";
+const isoYearFormat = "yyyy-MM-dd";
 const dateFormat = "do";
 const monthFormat = "MMMM y";
 // const mySqlFormat = "y-MM-dd HH:mm:ss";
@@ -40,6 +41,7 @@ const Planner = (props) => {
   const [game, setGame] = useState("");
   const [desc, setDesc] = useState("");
   const [events, setEvents] = useState("");
+  const [eventId, setEventId] = useState("");
 
   // const [content, setContent] = useState("");
   const currentdate = new Date();
@@ -62,13 +64,16 @@ const Planner = (props) => {
     if (on === true && isSameDay(x, selectedDate)) {
       setOn(false);
       setSelectedDate("");
+      setEventId("");
     } else if (on === true && !isSameDay(x, selectedDate)) {
       setSelectedDate(x);
       setSelectedDateSimple(format(x, isoYearFormat));
+      setEventId("");
     } else {
       setOn(true);
       setSelectedDate(x);
       setSelectedDateSimple(format(x, isoYearFormat));
+      setEventId("");
     }
   }
 
@@ -79,99 +84,123 @@ const Planner = (props) => {
   function nextMonth() {
     setDate(addMonths(date, 1));
   }
-  //
-  // var eventscall = () => {
-  //   EventService.getUserEvents(userId, selectedDateSimple).then((res) => {
-  //     console.log(res);
-  //     setEvents(res);
+
+  // useEffect(() => {
+  //   EventService.getUserEvents(props.user.id).then((res) => {
+  //     props.setEvents(res);
   //   });
-  // };
-
-  // eventscall();
-
-  // const forceUpdate = useForceUpdate();
-  //
-  useEffect(() => {
-    // console.log(selectedDateSimple);
-    // console.log(props.user);
-    EventService.getUserEvents(props.user.id, selectedDateSimple).then(
-      (res) => {
-        // console.log(res);
-        setEvents(res);
-        // console.log(events);
-      }
-    );
-  }, [selectedDate]);
-
-  useEffect(() => {
-    // console.log(events);
-    // setOn(true);
-  }, []);
-
-  useEffect(() => {
-    // console.log(userId);
-    // const user = AuthService.getCurrentUser();
-    // setUserId(user.id);
-  }, []);
+  // }, [props.updateEvent]);
 
   return (
-    <div className="planner-page row">
-      <div className="calendar-container col ">
+    <div className="d-xl-flex">
+      <div className="calendar-container text-millblack">
         {" "}
         <div className="month">
           <button
             type="button"
             onClick={prevMonth}
-            className="btn btn-outline-primary"
+            className="btn btn-outline-millblack"
           >
-            Prev
+            <span className="sr-only">Previous Month</span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              fill="currentColor"
+              class="bi bi-arrow-left"
+              viewBox="0 0 16 16"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"
+              />
+            </svg>
           </button>{" "}
           <h1 className="month-name">{format(date, monthFormat)}</h1>
           <button
             type="button"
             onClick={nextMonth}
-            className="btn btn-outline-primary button"
+            className="btn btn-outline-primary arrow-button"
           >
-            Next
+            <span className="sr-only">Next Month</span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              fill="currentColor"
+              class="bi bi-arrow-right"
+              viewBox="0 0 16 16"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"
+              />
+            </svg>
           </button>
         </div>
         <div className="calendar">
           <div className="days-of-week">
             {daysOfWeek.map((day) => {
-              return <span className="day-name">{day}</span>;
+              return (
+                <span className="px-lg-5 px-md-4 px-2 text-center">{day}</span>
+              );
             })}
           </div>
           <div className="calendar-blocks">
             {y.map((x, i) => {
               return (
-                <button
+                <div
                   className={
                     isSameDay(x, selectedDate)
-                      ? "btn btn-outline-secondary date selected"
+                      ? "position-relative btn-millyell date selected py-lg-5 p-md-4 p-3 text-center"
                       : isSameDay(x, currentdate)
-                      ? "btn btn-outline-secondary date current"
-                      : "btn btn-outline-secondary date"
+                      ? "position-relative btn-milllgrey date current py-lg-5 p-md-4 p-3 text-center"
+                      : "position-relative btn-milllgrey date py-lg-5 p-md-4 p-3 text-center"
                   }
                   style={i === 0 ? style : {}}
+                  // style={{ height: "120px" }}
                   onClick={() => {
                     handleClick(x);
                   }}
                 >
-                  {format(x, dateFormat)}
-                </button>
+                  <span
+                    className="date-value position-absolute"
+                    style={{ left: 5, top: 2 }}
+                  >
+                    {format(x, dateFormat)}
+                  </span>
+                  {props.events.map((e) => {
+                    return e.date === format(x, isoYearFormat) ? (
+                      <span className="calendar-events">
+                        <svg
+                          className=" d-md-inline"
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          fill="currentColor"
+                          class="bi bi-exclamation"
+                          viewBox="0 0 16 16"
+                        >
+                          <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.553.553 0 0 1-1.1 0L7.1 4.995z" />
+                        </svg>
+                      </span>
+                    ) : null;
+                  })}
+                </div>
               );
             })}
           </div>
         </div>
       </div>
-      <div className="col">
+      <div className="container row" style={{ right: 100 }}>
         {on ? (
           <StreamDisplay
             date={selectedDate}
             add={editEvent}
             setEdit={setEditEvent}
             setAdd={setAddEvent}
-            events={events}
+            events={props.events}
+            setEvents={props.setEvents}
             game={game}
             desc={desc}
             start={start}
@@ -180,52 +209,72 @@ const Planner = (props) => {
             setDesc={setDesc}
             setStart={setStart}
             setEnd={setEnd}
+            eventId={eventId}
+            setEventId={setEventId}
+            selectedDateISO={selectedDateSimple}
+            user={props.user}
+            updateEvent={props.updateEvent}
+            setUpdateEvent={props.setUpdateEvent}
           />
         ) : null}
       </div>
 
       {addEvent ? (
-        <div className="stream-form">
-          <EventForm
-            date={selectedDateSimple}
-            addEvent={addEvent}
-            setAdd={setAddEvent}
-            setEdit={setEditEvent}
-            game={game}
-            desc={desc}
-            start={start}
-            end={end}
-            setGame={setGame}
-            setDesc={setDesc}
-            setStart={setStart}
-            setEnd={setEnd}
-            // forceUpdate={forceUpdate}
-            userId={props.user.id}
-            // eventscall={eventscall}
-            setSelectedDate={setSelectedDate}
-          />
+        <div className="overlay">
+          <div
+            className="stream-form rounded"
+            style={{ top: 200, width: "40%", padding: 30 }}
+          >
+            <EventForm
+              date={selectedDateSimple}
+              addEvent={addEvent}
+              setAdd={setAddEvent}
+              setEdit={setEditEvent}
+              game={game}
+              desc={desc}
+              start={start}
+              end={end}
+              setGame={setGame}
+              setDesc={setDesc}
+              setStart={setStart}
+              setEnd={setEnd}
+              // forceUpdate={forceUpdate}
+              userId={props.user.id}
+              // eventscall={eventscall}
+              setSelectedDate={setSelectedDate}
+              setEvents={props.setEvents}
+              setUpdateEvent={props.setUpdateEvent}
+            />
+          </div>
         </div>
       ) : editEvent ? (
-        <div className="stream-form">
-          <EventForm
-            date={selectedDateSimple}
-            editEvent={editEvent}
-            addEvent={addEvent}
-            setAdd={setAddEvent}
-            setEdit={setEditEvent}
-            game={game}
-            desc={desc}
-            start={start}
-            end={end}
-            setGame={setGame}
-            setDesc={setDesc}
-            setStart={setStart}
-            setEnd={setEnd}
-            // forceUpdate={forceUpdate}
-            userId={props.user.id}
-            // eventscall={eventscall}
-            setSelectedDate={setSelectedDate}
-          />
+        <div className="overlay">
+          <div
+            className="stream-form rounded"
+            style={{ top: 200, width: "40%", padding: 30 }}
+          >
+            <EventForm
+              date={selectedDateSimple}
+              editEvent={editEvent}
+              addEvent={addEvent}
+              setAdd={setAddEvent}
+              setEdit={setEditEvent}
+              game={game}
+              desc={desc}
+              start={start}
+              end={end}
+              setGame={setGame}
+              setDesc={setDesc}
+              setStart={setStart}
+              setEnd={setEnd}
+              eventId={eventId}
+              // forceUpdate={forceUpdate}
+              userId={props.user.id}
+              // eventscall={eventscall}
+              setSelectedDate={setSelectedDate}
+              setUpdateEvent={props.setUpdateEvent}
+            />
+          </div>
         </div>
       ) : null}
     </div>

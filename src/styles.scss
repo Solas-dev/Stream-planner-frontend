@@ -12,6 +12,14 @@ $tertiary-color: #d7d5ca;
   grid-row-gap: 1px;
 }
 
+$theme-colors: (
+  "millyell": #efbf3f,
+  "milldgrey": #0c0d0d,
+  "milllgrey": #d7d5ca,
+  "millblack": #404040,
+);
+
+// @import "../node_modules/bootstrap/scss/variables";
 @import "../node_modules/bootstrap/scss/bootstrap";
 
 * {
@@ -32,17 +40,17 @@ $tertiary-color: #d7d5ca;
   height: 100vh;
 }
 
-.nav {
-  background-color: $header-color;
-}
+// .nav {
+//   background-color: $header-color;
+// }
 
-.navbar-dark {
-  .navbar-nav {
-    .nav-link {
-      color: #efbf3f;
-    }
-  }
-}
+// .navbar-dark {
+//   .navbar-nav {
+//     .nav-link {
+//       color: #efbf3f;
+//     }
+//   }
+// }
 
 .background {
   background-color: $secondary-color;
@@ -76,11 +84,6 @@ $tertiary-color: #d7d5ca;
   border-radius: 50%;
 }
 
-.container {
-  // background-color: $header-color;
-  // border-radius: 10px;
-  // padding: 10px;
-}
 .planner-page {
   // background-color: red;
   display: flex;
@@ -89,22 +92,28 @@ $tertiary-color: #d7d5ca;
 }
 
 .calendar-container {
-  margin: auto;
+  // margin: auto;
   // padding: 5rem;
   display: flex;
   flex-direction: column;
   // background-color: $header-color;
-  color: $secondary-color;
+  // color: $secondary-color;
 
   .month {
     width: 100%;
     display: flex;
     text-align: center;
     .btn {
-      height: 10%;
       align-self: center;
+      border-color: $header-color;
+      svg {
+        fill: $header-color;
+      }
       &:focus {
         outline: none;
+      }
+      &:hover {
+        background-color: $primary-color;
       }
     }
   }
@@ -113,30 +122,19 @@ $tertiary-color: #d7d5ca;
     padding: 10px 0;
   }
 
-  // .button {
-  //   border: none;
-  //   padding: 15px 20px;
-  //   height: 50%;
-  // }
-
   .days-of-week {
-    padding: 20px 0;
+    background-color: $primary-color;
     @include calendar();
   }
 
   .calendar-blocks {
     @include calendar();
-    .btn {
-      padding: 50px;
-      /* border-radius: 0; */
-      border: none;
-      // border-top: solid 1px;
-      // border-left: solid 1px;
-      border-radius: 0;
-      background-color: $tertiary-color;
-      // color: inherit;
+    .btn-millyell {
+      max-height: 121px;
+      height: 120px;
+      border-radius: 5px;
       &:hover {
-        color: inherit;
+        cursor: pointer;
         background-color: $primary-color;
       }
       &:active {
@@ -144,26 +142,36 @@ $tertiary-color: #d7d5ca;
         background-color: lighten($primary-color, 15%);
       }
     }
-    .selected {
-      background-color: $primary-color;
-      color: inherit;
-    }
-    .current {
-      // background-color: lighten($primary-color, 24%);
-      // color: inherit;
+    .btn-milllgrey {
+      max-height: 121px;
+      height: 120px;
+      border-radius: 5px;
+      &:hover {
+        cursor: pointer;
+        background-color: $primary-color;
+      }
+      &:active {
+        color: inherit;
+        background-color: lighten($primary-color, 15%);
+      }
     }
   }
-
-  .stream-list {
-    position: relative;
-    // left: 100px;
-    // top: 0;
+  @media (min-width: 0) and (max-width: 500px) {
+    .calendar-blocks {
+      .btn-millyell {
+        height: 100%;
+      }
+      .btn-milllgrey {
+        height: 100%;
+      }
+      svg {
+        display: none;
+      }
+    }
   }
 }
 
-.day-name {
-  text-align: center;
-}
+//EVENT FORM STYLES
 
 .form-container {
   position: absolute;
@@ -205,4 +213,11 @@ $tertiary-color: #d7d5ca;
   background-color: white;
   border: solid 2px black;
   padding: 10px;
+  width: 40%;
+}
+
+@media (min-width: 0px) and (max-width: 900px) {
+  .stream-form {
+    width: 100%;
+  }
 }
