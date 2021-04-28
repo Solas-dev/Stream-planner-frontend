@@ -1,16 +1,16 @@
-import React, { useState, useEffect } from "react";
-import EventForm from "./RecurringForm.js";
+import React, { useState } from "react";
 import AuthService from "../services/auth.service";
+
+import * as uuidAPIKey from "uuid-apikey";
 
 const Profile = () => {
   const currentUser = AuthService.getCurrentUser();
-  const [addRecurring, setAddRecurring] = useState(false);
-  const [start, setStart] = useState("");
-  const [end, setEnd] = useState("");
-  const [game, setGame] = useState("");
-  const [desc, setDesc] = useState("");
-  const [events, setEvents] = useState("");
-  const [eventId, setEventId] = useState("");
+  const [key, setKey] = useState();
+  var createKey = () => {
+    setKey();
+    AuthService.addKey(uuidAPIKey.create().uuid, currentUser.id);
+  };
+  console.log(key);
 
   return (
     <div className="container">
@@ -19,6 +19,15 @@ const Profile = () => {
           <strong>{currentUser.username}</strong> Profile
         </h3>
       </header>
+      <button onClick={createKey}>
+        {key ? "Generate new key" : "Generate key"}
+      </button>
+      {key ? (
+        <div>
+          <p>{key.apiKey} </p>
+          <p>Make note of this key</p>
+        </div>
+      ) : null}
     </div>
   );
 };

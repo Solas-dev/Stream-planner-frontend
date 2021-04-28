@@ -1,27 +1,12 @@
 import React from "react";
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
-import {
-  isBefore,
-  getTime,
-  format,
-  addWeeks,
-  startOfWeek,
-  getDay,
-  addDays,
-} from "date-fns";
+import { isBefore, format, addWeeks, getDay, addDays } from "date-fns";
 import EventService from "../services/event.service";
 // const formatdate = "yyyy-'W'ww";
 const formatdate = "yyyy-MM-dd";
 
 const EventForm = (props) => {
-  const before = (start, end) => {
-    return isBefore(
-      new Date(props.date + " " + end),
-      new Date(props.date + " " + start)
-    );
-  };
-
   const EventFormSchema = Yup.object().shape({
     game: Yup.string(),
     title: Yup.string().max(400, "Title cannot be longer than 400 char"),
@@ -72,16 +57,34 @@ const EventForm = (props) => {
             let currentdate = addDays(date, i);
             values.weekdays.map((d) => {
               // console.log(currentdate, d);
-              if (getDay(currentdate) === parseInt(d, 10)) {
-                result.push({
-                  game: values.game,
-                  description: values.desc,
-                  date: format(currentdate, formatdate),
-                  start: values.start,
-                  end: values.end,
-                  userId: props.userId,
-                });
+              if (values.end !== "") {
+                if (getDay(currentdate) === parseInt(d, 10)) {
+                  result.push({
+                    game: values.game,
+                    description: values.desc,
+                    date: format(currentdate, formatdate),
+                    start: values.start,
+                    end: values.end,
+                    userId: props.userId,
+                  });
+                } else {
+                  return null;
+                }
+              } else {
+                if (getDay(currentdate) === parseInt(d, 10)) {
+                  result.push({
+                    game: values.game,
+                    description: values.desc,
+                    date: format(currentdate, formatdate),
+                    start: values.start,
+                    end: null,
+                    userId: props.userId,
+                  });
+                } else {
+                  return null;
+                }
               }
+              return null;
             });
           }
 
@@ -93,21 +96,18 @@ const EventForm = (props) => {
         // console.log(values);
 
         EventService.addRecurringEvent(result)
-          .then((res) => {
-            console.log(res);
-          })
           .then(() => {
             setTimeout(() => {
               props.setUpdateEvent(true);
               props.setUpdateEvent(false);
-            }, 200);
+            }, 300);
             // props.setEdit(false);
             props.setAddRecurring(false);
           })
           .catch("Something went wrong");
       }}
       render={({ errors, status, touched }) => (
-        <Form>
+        <Form className="px-2">
           <h3 className="text-center">
             <u>Add multiple streams at once.</u>
           </h3>

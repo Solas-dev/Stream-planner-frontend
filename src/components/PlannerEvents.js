@@ -1,10 +1,8 @@
 import React, { useState } from "react";
-import { format, isSameDay, parseISO } from "date-fns";
+import { format } from "date-fns";
 import EventService from "../services/event.service";
-import Alert from "react-bootstrap/Alert";
 
 const dateListFormat = "d-M-yyyy";
-const displayFormat = "HH:mm";
 
 const StreamDisplay = (props) => {
   const [alert, setAlert] = useState(false);

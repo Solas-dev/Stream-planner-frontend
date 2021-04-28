@@ -1,125 +1,107 @@
-import React, { useState, useRef } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Redirect } from "react-router-dom";
+import React, { useState } from "react";
+import { Formik, Form, Field } from "formik";
+import * as Yup from "yup";
+import AuthService from "../services/auth.service";
 
-import Form from "react-validation/build/form";
-import Input from "react-validation/build/input";
-import CheckButton from "react-validation/build/button";
-
-import { login } from "../actions/auth";
-
-const required = (value) => {
-  if (!value) {
-    return (
-      <div className="alert alert-danger" role="alert">
-        This field is required!
-      </div>
-    );
-  }
-};
+const LoginFormSchema = Yup.object().shape({
+  username: Yup.string().required("Please Enter a Username"),
+  password: Yup.string().required("Please Enter a Password"),
+});
 
 const Login = (props) => {
-  const form = useRef();
-  const checkBtn = useRef();
-
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-
-  const { isLoggedIn } = useSelector((state) => state.auth);
-  const { message } = useSelector((state) => state.message);
-
-  const dispatch = useDispatch();
-
-  const onChangeUsername = (e) => {
-    const username = e.target.value;
-    setUsername(username);
-  };
-
-  const onChangePassword = (e) => {
-    const password = e.target.value;
-    setPassword(password);
-  };
-
-  const handleLogin = (e) => {
-    e.preventDefault();
-
-    setLoading(true);
-
-    form.current.validateAll();
-
-    if (checkBtn.current.context._errors.length === 0) {
-      dispatch(login(username, password))
-        .then(() => {
-          props.history.push("/profile");
-          window.location.reload();
-        })
-        .catch(() => {
-          setLoading(false);
-        });
-    } else {
-      setLoading(false);
-    }
-  };
-
-  if (isLoggedIn) {
-    return <Redirect to="/profile" />;
-  }
+  const [message, setMessage] = useState("");
 
   return (
-    <div className="col-md-12">
-      <div className="card card-container">
-        <img
-          src="//ssl.gstatic.com/accounts/ui/avatar_2x.png"
-          alt="profile-img"
-          className="profile-img-card"
-        />
+    <Formik
+      initialValues={{
+        username: "",
+        password: "",
+      }}
+      validationSchema={LoginFormSchema}
+      onSubmit={(values) => {
+        setMessage("");
+        setLoading(true);
+        AuthService.login(values.username, values.password).then(
+          () => {
+            props.history.push("/");
+            window.location.reload();
+          },
+          (error) => {
+            const resMessage =
+              (error.response &&
+                error.response.data &&
+                error.response.data.message) ||
+              error.message ||
+              error.toString();
 
-        <Form onSubmit={handleLogin} ref={form}>
-          <div className="form-group">
-            <label htmlFor="username">Username</label>
-            <Input
-              type="text"
-              className="form-control"
-              name="username"
-              value={username}
-              onChange={onChangeUsername}
-              validations={[required]}
-            />
-          </div>
+            setLoading(false);
+            setMessage(resMessage);
+          }
+        );
+      }}
+      render={({ errors, status, touched }) => (
+        <Form className="text-center">
+          <div className="col-md-12">
+            <div className="card card-container">
+              <img
+                src="//ssl.gstatic.com/accounts/ui/avatar_2x.png"
+                alt="profile-img"
+                className="profile-img-card"
+              />
 
-          <div className="form-group">
-            <label htmlFor="password">Password</label>
-            <Input
-              type="password"
-              className="form-control"
-              name="password"
-              value={password}
-              onChange={onChangePassword}
-              validations={[required]}
-            />
-          </div>
-
-          <div className="form-group">
-            <button className="btn btn-primary btn-block" disabled={loading}>
-              {loading && (
-                <span className="spinner-border spinner-border-sm"></span>
-              )}
-              <span>Login</span>
-            </button>
-          </div>
-
-          {message && (
-            <div className="form-group">
-              <div className="alert alert-danger" role="alert">
-                {message}
+              <div className="form-group">
+                <label htmlFor="username">Username</label>
+                <Field
+                  type="text"
+                  className="form-control w-75 mx-auto"
+                  name="username"
+                />
+                {errors.username && touched.username ? (
+                  <div className="alert alert-danger w-75 mx-auto">
+                    {errors.username}
+                  </div>
+                ) : null}
               </div>
+              <div className="form-group">
+                <label htmlFor="password">Password</label>
+                <Field
+                  type="password"
+                  className="form-control w-75 mx-auto"
+                  name="password"
+                />
+                {errors.password && touched.password ? (
+                  <div className="alert alert-danger w-75 mx-auto">
+                    {errors.password}
+                  </div>
+                ) : null}
+              </div>
+
+              <div className="form-group">
+                <button
+                  className="btn btn-primary btn-block"
+                  disabled={loading}
+                  type="submit"
+                >
+                  {loading && (
+                    <span className="spinner-border spinner-border-sm"></span>
+                  )}
+                  <span>Login</span>
+                </button>
+              </div>
+
+              {message && (
+                <div className="form-group">
+                  <div className="alert alert-danger" role="alert">
+                    {message}
+                  </div>
+                </div>
+              )}
             </div>
-          )}
-          <CheckButton style={{ display: "none" }} ref={checkBtn} />
+          </div>
         </Form>
-      </div>
-    </div>
+      )}
+    />
   );
 };
 

@@ -1,28 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
-// import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
-import { useDeepCompareEffect } from "react-use";
 import "bootstrap/dist/js/bootstrap";
-// import { Alert } from "react-bootstrap";
-// import "bootstrap/dist/css/bootstrap.min.css";
-
-import UserService from "./services/user.service";
 import AuthService from "./services/auth.service";
 import EventService from "./services/event.service";
-
 import Overview from "./components/Overview";
-import Login from "./components/Login";
-import Register from "./components/Register";
+import Login from "./components/Login2";
+import Register from "./components/Register2";
 import Home from "./components/Home";
 import Profile from "./components/Profile";
 import Planner from "./components/Planner";
-import BoardModerator from "./components/BoardModerator";
-import BoardAdmin from "./components/BoardAdmin";
 
 const App = () => {
-  const [showModeratorBoard, setShowModeratorBoard] = useState(false);
-  const [showAdminBoard, setShowAdminBoard] = useState(false);
   const [currentUser, setCurrentUser] = useState(AuthService.getCurrentUser());
   const [userEvents, setUserEvents] = useState([]);
   const [updateEvent, setUpdateEvent] = useState(false);
@@ -39,9 +28,8 @@ const App = () => {
   useEffect(() => {
     if (currentUser) {
       AuthService.checkUser(currentUser.id).then((res) => {
-        console.log(res);
         if (res === false) {
-          AuthService.logOut();
+          AuthService.logout();
         }
       });
 
@@ -72,8 +60,8 @@ const App = () => {
   };
 
   return (
-    <Router>
-      <div className="main-body ">
+    <div className="main-body">
+      <Router>
         <nav className="navbar navbar-expand-lg navbar-dark nav bg-milldgrey">
           <Link to={"/"} className="navbar-brand">
             millPlan
@@ -144,7 +132,7 @@ const App = () => {
         <div className="container mt-3">
           <Switch>
             <Route exact path={["/", "/home"]} component={Home} />
-            <Route path="/login" component={Login} />
+            <Route exact path="/login" component={Login} />
             <Route exact path="/register" component={Register} />
             <Route
               exact
@@ -187,8 +175,8 @@ const App = () => {
             />
           </Switch>
         </div>
-      </div>
-    </Router>
+      </Router>
+    </div>
   );
 };
 
