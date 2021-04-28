@@ -10486,7 +10486,7 @@ h3 {
 
 .main-body {
   background-color: #f7f7f7;
-  height: 100vh;
+  min-height: 100vh;
 }
 
 .background {
@@ -10611,8 +10611,9 @@ h3 {
 }
 
 .overlay {
-  position: fixed;
+  position: absolute;
   top: 0;
+  bottom: 0;
   left: 0;
   height: 100%;
   width: 100%;
@@ -10620,36 +10621,28 @@ h3 {
   background-color: rgba(0, 0, 0, 0.5);
 }
 
-.exit-button {
-  position: absolute;
-  right: 0;
-  top: 0;
-  margin: 2px;
-  border: none;
-  background-color: #e70000;
-  text-align: center;
-  border-radius: 5px;
-}
-
 /* .stream-dialog */
 .stream-form {
-  position: fixed;
-  display: flex;
-  flex-direction: column;
+  position: absolute;
   z-index: 11;
-  top: 0;
+  top: 10%;
   left: 50%;
   transform: translate(-50%, 0);
-  width: 60%;
+  width: 40%;
   background-color: white;
   border: solid 2px black;
   padding: 10px;
-  width: 40%;
+  overflow-y: scroll;
 }
 
 @media (min-width: 0px) and (max-width: 900px) {
   .stream-form {
     width: 100%;
+    top: 0;
+  }
+
+  .hide-overview {
+    display: none;
   }
 }
 

@@ -5,13 +5,6 @@ import { isBefore } from "date-fns";
 import EventService from "../services/event.service";
 
 const EventForm = (props) => {
-  const before = (start, end) => {
-    return isBefore(
-      new Date(props.date + " " + end),
-      new Date(props.date + " " + start)
-    );
-  };
-
   const EventFormSchema = Yup.object().shape({
     game: Yup.string().required("A game title is required!"),
     desc: Yup.string().max(400, "Description cannot be longer than 400 char"),
@@ -22,7 +15,6 @@ const EventForm = (props) => {
       function (value) {
         const { start } = this.parent;
         const { date } = this.parent;
-        // console.log(value);
         if (value === undefined) {
           return true;
         }
@@ -30,7 +22,6 @@ const EventForm = (props) => {
           new Date(date + " " + start),
           new Date(date + " " + value)
         );
-        // return before(value, start);
       }
     ),
   });
@@ -72,7 +63,7 @@ const EventForm = (props) => {
             })
             .catch("Something went wrong");
         } else if (props.addEvent) {
-          console.log("EMPTY");
+          // console.log("EMPTY");
           EventService.addEvent(
             values.game,
             values.desc,

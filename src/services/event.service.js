@@ -1,5 +1,5 @@
 import axios from "axios";
-import authHeader from "./auth-header";
+// import authHeader from "./auth-header";
 
 const API_URL = "http://localhost:8080/api/";
 
@@ -20,9 +20,9 @@ const addEvent = (game, description, date, start, end, userId) => {
     });
 };
 
-const updateEvent = (game, description, date, start, end, id) => {
+const updateEvent = (game, description, date, start, end, userId) => {
   return axios
-    .post(API_URL + "event/update?id=" + id, {
+    .post(API_URL + "event/update?id=" + userId, {
       game,
       description,
       date,
@@ -41,9 +41,13 @@ const getUserEvents = (userId) => {
 };
 
 const deleteEvent = (userId) => {
-  return axios.post(API_URL + "event/delete?id=" + userId).then((response) => {
-    return response.data;
-  });
+  return axios
+    .post(API_URL + "event/delete", {
+      userId,
+    })
+    .then((response) => {
+      return response.data;
+    });
 };
 
 const addRecurringEvent = (array) => {
@@ -51,6 +55,8 @@ const addRecurringEvent = (array) => {
     return response.data;
   });
 };
+
+// ?id=" + userId
 
 export default {
   addEvent,

@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import EventForm from "./PlannerForm.js";
 import StreamDisplay from "./PlannerEvents.js";
-import { useDeepCompareEffect } from "react-use";
 
 import {
   format,
@@ -13,9 +12,6 @@ import {
   subMonths,
   addMonths,
 } from "date-fns";
-
-import AuthService from "../services/auth.service";
-import EventService from "../services/event.service";
 
 const isoYearFormat = "yyyy-MM-dd";
 const dateFormat = "do";
@@ -40,7 +36,7 @@ const Planner = (props) => {
   const [end, setEnd] = useState("");
   const [game, setGame] = useState("");
   const [desc, setDesc] = useState("");
-  const [events, setEvents] = useState("");
+  // const [events, setEvents] = useState("");
   const [eventId, setEventId] = useState("");
 
   // const [content, setContent] = useState("");
@@ -53,7 +49,7 @@ const Planner = (props) => {
 
   const daysOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
-  let y = eachDayOfInterval({
+  let daysOfMonth = eachDayOfInterval({
     start: monthStart,
     end: monthEnd,
   });
@@ -147,7 +143,7 @@ const Planner = (props) => {
             })}
           </div>
           <div className="calendar-blocks">
-            {y.map((x, i) => {
+            {daysOfMonth.map((x, i) => {
               return (
                 <div
                   className={
@@ -282,3 +278,78 @@ const Planner = (props) => {
 };
 
 export default Planner;
+
+//
+// {displayType == "week"
+//   ? sortedEvents.map((d, i) => {
+//       if (isThisWeek(new Date(d.date), { weekStartsOn: 1 })) {
+//         return (
+//           <div className="m-2 py-1 col-md-2 text-center bg-millyell rounded">
+//             <p className="m-0">{format(new Date(d.date), "EEEE")}</p>
+//             <p className="m-0">Game: {d.game ? d.game : "TBD"}</p>
+//             {d.end ? (
+//               <p className="m-0">
+//                 {d.start.slice(0, 5) + " - " + d.end.slice(0, 5)}{" "}
+//               </p>
+//             ) : (
+//               <p className="m-0">Start: {d.start.slice(0, 5)}</p>
+//             )}
+//           </div>
+//         );
+//       }
+//     })
+//   : displayType == "month"
+//   ? sortedEvents.map((d, i) => {
+//       if (isThisMonth(new Date(d.date), { weekStartsOn: 1 })) {
+//         return (
+//           <div className="m-2 py-1 col-md-2 text-center bg-millyell rounded ">
+//             {deleteItems ? (
+//               <Formik
+//                 initialValues={{
+//                   delete: [],
+//                 }}
+//                 onSubmit={(values) => {
+//                   console.log(values.value);
+//                 }}
+//                 render={() => (
+//                   <Form>
+//                     <Field type="checkbox" name="delete" value={d.id} />
+//                   </Form>
+//                 )}
+//               />
+//             ) : (
+//               // <input type="checkbox" id={d.id} value={d.id}></input>
+//               ""
+//             )}
+//
+//             <p className="m-0">{format(new Date(d.date), "do")}</p>
+//             <p className="m-0">Game: {d.game ? d.game : "TBD"}</p>
+//             {d.end ? (
+//               <p className="m-0">
+//                 {d.start.slice(0, 5) + " - " + d.end.slice(0, 5)}{" "}
+//               </p>
+//             ) : (
+//               <p className="m-0">Start: {d.start.slice(0, 5)}</p>
+//             )}
+//           </div>
+//         );
+//       }
+//     })
+//   : null}
+// </div>
+//
+//
+
+//FORMIK FOR TEST
+
+// <Formik
+//   initialValues={{
+//     delete: [],
+//   }}
+//   onSubmit={(values) => {
+//     console.log(values.value);
+//   }}
+//   render={() => (
+//
+//   )}
+// />

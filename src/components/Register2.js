@@ -1,168 +1,128 @@
-import React, { useState, useRef } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useState } from "react";
+import { Formik, Form, Field } from "formik";
+import * as Yup from "yup";
+import AuthService from "../services/auth.service";
 
-import Form from "react-validation/build/form";
-import Input from "react-validation/build/input";
-import CheckButton from "react-validation/build/button";
-import { isEmail } from "validator";
+const RegisterFormSchema = Yup.object().shape({
+  username: Yup.string()
+    .required("Please Enter a Username")
+    .min(3, "Username is too short")
+    .max(20, "Username is too long"),
+  email: Yup.string().email().required("Please Enter an email"),
+  password: Yup.string().required("Please Enter a Password").min(6).max(40),
+});
 
-import { register } from "../actions/auth";
-
-const required = (value) => {
-  if (!value) {
-    return (
-      <div className="alert alert-danger" role="alert">
-        This field is required!
-      </div>
-    );
-  }
-};
-
-const validEmail = (value) => {
-  if (!isEmail(value)) {
-    return (
-      <div className="alert alert-danger" role="alert">
-        This is not a valid email.
-      </div>
-    );
-  }
-};
-
-const vusername = (value) => {
-  if (value.length < 3 || value.length > 20) {
-    return (
-      <div className="alert alert-danger" role="alert">
-        The username must be between 3 and 20 characters.
-      </div>
-    );
-  }
-};
-
-const vpassword = (value) => {
-  if (value.length < 6 || value.length > 40) {
-    return (
-      <div className="alert alert-danger" role="alert">
-        The password must be between 6 and 40 characters.
-      </div>
-    );
-  }
-};
-
-const Register = () => {
-  const form = useRef();
-  const checkBtn = useRef();
-
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+const Register = (props) => {
+  const [message, setMessage] = useState("");
   const [successful, setSuccessful] = useState(false);
 
-  const { message } = useSelector((state) => state.message);
-  const dispatch = useDispatch();
-
-  const onChangeUsername = (e) => {
-    const username = e.target.value;
-    setUsername(username);
-  };
-
-  const onChangeEmail = (e) => {
-    const email = e.target.value;
-    setEmail(email);
-  };
-
-  const onChangePassword = (e) => {
-    const password = e.target.value;
-    setPassword(password);
-  };
-
-  const handleRegister = (e) => {
-    e.preventDefault();
-
-    setSuccessful(false);
-
-    form.current.validateAll();
-
-    if (checkBtn.current.context._errors.length === 0) {
-      dispatch(register(username, email, password))
-        .then(() => {
-          setSuccessful(true);
-        })
-        .catch(() => {
-          setSuccessful(false);
-        });
-    }
-  };
-
   return (
-    <div className="col-md-12">
-      <div className="card card-container">
-        <img
-          src="//ssl.gstatic.com/accounts/ui/avatar_2x.png"
-          alt="profile-img"
-          className="profile-img-card"
-        />
+    <Formik
+      initialValues={{
+        username: "",
+        password: "",
+        email: "",
+      }}
+      validationSchema={RegisterFormSchema}
+      onSubmit={(values) => {
+        setMessage("");
+        setSuccessful(false);
+        AuthService.register(
+          values.username,
+          values.email,
+          values.password
+        ).then(
+          (response) => {
+            setMessage(response.data.message);
+            setSuccessful(true);
+          },
+          (error) => {
+            const resMessage =
+              (error.response &&
+                error.response.data &&
+                error.response.data.message) ||
+              error.message ||
+              error.toString();
 
-        <Form onSubmit={handleRegister} ref={form}>
-          {!successful && (
-            <div>
+            setMessage(resMessage);
+            setSuccessful(false);
+          }
+        );
+      }}
+      render={({ errors, status, touched }) => (
+        <Form className="text-center">
+          <div className="col-md-12">
+            <div className="card card-container">
+              <img
+                src="//ssl.gstatic.com/accounts/ui/avatar_2x.png"
+                alt="profile-img"
+                className="profile-img-card"
+              />
+
               <div className="form-group">
                 <label htmlFor="username">Username</label>
-                <Input
+                <Field
                   type="text"
-                  className="form-control"
+                  className="form-control w-75 mx-auto"
                   name="username"
-                  value={username}
-                  onChange={onChangeUsername}
-                  validations={[required, vusername]}
                 />
+                {errors.username && touched.username ? (
+                  <div className="alert alert-danger w-75 mx-auto">
+                    {errors.username}
+                  </div>
+                ) : null}
               </div>
-
               <div className="form-group">
                 <label htmlFor="email">Email</label>
-                <Input
+                <Field
                   type="text"
-                  className="form-control"
+                  className="form-control w-75 mx-auto"
                   name="email"
-                  value={email}
-                  onChange={onChangeEmail}
-                  validations={[required, validEmail]}
                 />
+                {errors.email && touched.email ? (
+                  <div className="alert alert-danger w-75 mx-auto">
+                    {errors.email}
+                  </div>
+                ) : null}
               </div>
 
               <div className="form-group">
                 <label htmlFor="password">Password</label>
-                <Input
+                <Field
                   type="password"
-                  className="form-control"
+                  className="form-control w-75 mx-auto"
                   name="password"
-                  value={password}
-                  onChange={onChangePassword}
-                  validations={[required, vpassword]}
                 />
+                {errors.password && touched.password ? (
+                  <div className="alert alert-danger w-75 mx-auto">
+                    {errors.password}
+                  </div>
+                ) : null}
               </div>
 
               <div className="form-group">
-                <button className="btn btn-primary btn-block">Sign Up</button>
+                <button className="btn btn-primary btn-block" type="submit">
+                  <span>Register</span>
+                </button>
               </div>
-            </div>
-          )}
 
-          {message && (
-            <div className="form-group">
-              <div
-                className={
-                  successful ? "alert alert-success" : "alert alert-danger"
-                }
-                role="alert"
-              >
-                {message}
-              </div>
+              {message && (
+                <div className="form-group">
+                  <div
+                    className={
+                      successful ? "alert alert-success" : "alert alert-danger"
+                    }
+                    role="alert"
+                  >
+                    {message}
+                  </div>
+                </div>
+              )}
             </div>
-          )}
-          <CheckButton style={{ display: "none" }} ref={checkBtn} />
+          </div>
         </Form>
-      </div>
-    </div>
+      )}
+    />
   );
 };
 

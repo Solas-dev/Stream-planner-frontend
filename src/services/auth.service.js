@@ -12,6 +12,7 @@ const register = (username, email, password) => {
 };
 
 const login = (username, password) => {
+  console.log("RR");
   return axios
     .post(API_URL + "signin", {
       username,
@@ -38,6 +39,15 @@ const checkUser = (id) => {
     });
 };
 
+const addKey = (uuid, userId) => {
+  return axios
+    .post(API_URL + "addkey", {
+      uuid,
+      userId,
+    })
+    .then((res) => res.date);
+};
+
 const logout = () => {
   localStorage.removeItem("user");
 };
@@ -52,4 +62,5 @@ export default {
   logout,
   getCurrentUser,
   checkUser,
+  addKey,
 };
